@@ -71,3 +71,17 @@ resource "azurerm_machine_learning_compute_instance" "ml_compute_instance" {
     ]
   }
 }
+
+resource "null_resource" "set_idle_time" {
+  provisioner "local-exec" {
+    command = <<EOT
+      az ml compute update --name ${azurerm_machine_learning_compute_instance.ml_compute_instance.name} \
+       --workspace-name ${azurerm_machine_learning_workspace.default.name} \
+       --resource-group ${azurerm_resource_group.default.name} \
+       --tags idle_time_before_scale_down=30
+    EOT
+  }
+
+  depends_on = [azurerm_machine_learning_compute_instance.ml_compute_instance]
+}
+
